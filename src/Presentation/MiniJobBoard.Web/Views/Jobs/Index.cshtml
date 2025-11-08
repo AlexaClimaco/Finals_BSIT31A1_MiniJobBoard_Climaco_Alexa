@@ -1,0 +1,77 @@
+@model IEnumerable<MiniJobBoard.Infrastructure.Entities.Job>
+@{
+    ViewData["Title"] = "Browse Jobs";
+}
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="mb-0" style="color: var(--primary-color);">@ViewData["Title"]</h2>
+        <p class="text-muted mb-0">Discover your next career opportunity</p>
+    </div>
+    <div class="col-md-4 text-end">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-action="Create" class="btn btn-success px-4">+ Post a Job</a>
+        }
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <form asp-action="Index" method="get" class="input-group">
+            <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Search jobs by title, description, or location..." />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var job in Model)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card border-0 shadow-sm hover-lift" style="transition: transform 0.2s;">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h5 class="card-title">@job.Title</h5>
+                                <p class="card-text text-muted mb-2">
+                                    <strong>@job.Employer?.Email</strong>
+                                    @if (!string.IsNullOrEmpty(job.Location))
+                                    {
+                                        <span> • @job.Location</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(job.JobType))
+                                    {
+                                        <span> • @job.JobType</span>
+                                    }
+                                </p>
+                                <p class="card-text">@(job.Description.Length > 200 ? job.Description.Substring(0, 200) + "..." : job.Description)</p>
+                                @if (job.Salary.HasValue)
+                                {
+                                    <p class="card-text"><strong>Salary:</strong> @job.Salary.Value.ToString("C")</p>
+                                }
+                                <small class="text-muted">Posted on @job.PostedDate.ToString("MMM dd, yyyy")</small>
+                                @if (job.Deadline.HasValue)
+                                {
+                                    <small class="text-muted"> • Deadline: @job.Deadline.Value.ToString("MMM dd, yyyy")</small>
+                                }
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a asp-action="Details" asp-route-id="@job.Id" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No jobs found</h4>
+        <p>@(ViewBag.SearchTerm != null ? "Try a different search term." : "There are currently no active job postings.")</p>
+    </div>
+}
