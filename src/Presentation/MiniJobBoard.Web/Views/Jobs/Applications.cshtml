@@ -1,0 +1,86 @@
+@model IEnumerable<MiniJobBoard.Infrastructure.Entities.JobApplication>
+@{
+    ViewData["Title"] = "Applications";
+    var job = ViewBag.Job as MiniJobBoard.Infrastructure.Entities.Job;
+}
+
+<div class="mb-4">
+    <h2>Applications for: @job?.Title</h2>
+    <p class="text-muted">Total Applications: @Model.Count()</p>
+    <a asp-action="Details" asp-route-id="@job?.Id" class="btn btn-secondary">Back to Job</a>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var application in Model)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="card-title">
+                                    @application.Applicant?.FirstName @application.Applicant?.LastName
+                                    <span class="badge bg-@(GetStatusBadgeClass(application.Status))">@application.Status</span>
+                                </h5>
+                                <p class="card-text"><strong>Email:</strong> @application.Applicant?.Email</p>
+                                <p class="card-text"><strong>Applied:</strong> @application.AppliedDate.ToString("MMMM dd, yyyy")</p>
+                                
+                                @if (!string.IsNullOrEmpty(application.CoverLetter))
+                                {
+                                    <p class="card-text">
+                                        <strong>Cover Letter:</strong><br />
+                                        @application.CoverLetter
+                                    </p>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(application.ResumeUrl))
+                                {
+                                    <p class="card-text">
+                                        <strong>Resume:</strong> <a href="@application.ResumeUrl" target="_blank">View Resume</a>
+                                    </p>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Update Status</h6>
+                                <form asp-controller="Applications" asp-action="UpdateStatus" asp-route-id="@application.Id" method="post">
+                                    <select name="status" class="form-select mb-2">
+                                        <option value="@MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Pending" selected="@(application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Pending)">Pending</option>
+                                        <option value="@MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Reviewed" selected="@(application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Reviewed)">Reviewed</option>
+                                        <option value="@MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Shortlisted" selected="@(application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Shortlisted)">Shortlisted</option>
+                                        <option value="@MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Rejected" selected="@(application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Rejected)">Rejected</option>
+                                        <option value="@MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Accepted" selected="@(application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Accepted)">Accepted</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary w-100">Update Status</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No applications yet</h4>
+        <p>No one has applied to this job yet.</p>
+    </div>
+}
+
+@functions {
+    string GetStatusBadgeClass(MiniJobBoard.Infrastructure.Entities.ApplicationStatus status)
+    {
+        return status switch
+        {
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Pending => "secondary",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Reviewed => "info",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Shortlisted => "primary",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Rejected => "danger",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Accepted => "success",
+            _ => "secondary"
+        };
+    }
+}

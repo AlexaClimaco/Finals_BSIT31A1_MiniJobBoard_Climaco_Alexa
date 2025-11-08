@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="hero text-center mb-5">
+    <h1 class="display-3 fw-bold mb-3">Welcome to Mini Job Board</h1>
+    <p class="lead mb-4">Connecting talented professionals with amazing opportunities</p>
+    
+    <div class="mt-4">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-light btn-lg me-2 px-4">Browse Jobs</a>
+            <a asp-controller="Jobs" asp-action="MyJobs" class="btn btn-outline-light btn-lg px-4">My Jobs</a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg me-2 px-4">Get Started</a>
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-outline-light btn-lg px-4">Browse Jobs</a>
+        }
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">For Job Seekers</h3>
+                <p class="card-text">Browse thousands of job opportunities and apply with ease. Track your applications and get hired faster.</p>
+                <ul>
+                    <li>Create your profile</li>
+                    <li>Search and filter jobs</li>
+                    <li>Apply with cover letter</li>
+                    <li>Track application status</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">For Employers</h3>
+                <p class="card-text">Post job openings and find qualified candidates. Manage applications and connect with talent.</p>
+                <ul>
+                    <li>Post unlimited jobs</li>
+                    <li>Review applications</li>
+                    <li>Update application status</li>
+                    <li>Find the right talent</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
