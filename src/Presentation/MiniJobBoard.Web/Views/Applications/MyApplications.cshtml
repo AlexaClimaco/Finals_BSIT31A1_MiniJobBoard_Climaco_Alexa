@@ -1,0 +1,86 @@
+@model IEnumerable<MiniJobBoard.Infrastructure.Entities.JobApplication>
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var application in Model)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h5 class="card-title">
+                                    @application.Job?.Title
+                                    <span class="badge bg-@(GetStatusBadgeClass(application.Status))">@application.Status</span>
+                                </h5>
+                                <p class="card-text text-muted mb-2">
+                                    <strong>Company:</strong> @application.Job?.Employer?.Email
+                                    @if (!string.IsNullOrEmpty(application.Job?.Location))
+                                    {
+                                        <span> • @application.Job.Location</span>
+                                    }
+                                </p>
+                                <p class="card-text"><strong>Applied:</strong> @application.AppliedDate.ToString("MMMM dd, yyyy")</p>
+                                
+                                @if (!string.IsNullOrEmpty(application.CoverLetter))
+                                {
+                                    <div class="mt-2">
+                                        <strong>Your Cover Letter:</strong>
+                                        <p class="text-muted small">@(application.CoverLetter.Length > 150 ? application.CoverLetter.Substring(0, 150) + "..." : application.CoverLetter)</p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@application.JobId" class="btn btn-sm btn-primary w-100 mb-2">View Job</a>
+                                
+                                @if (application.Status == MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Pending)
+                                {
+                                    <form asp-action="Withdraw" asp-route-id="@application.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to withdraw this application?');">
+                                        <button type="submit" class="btn btn-sm btn-danger w-100">Withdraw</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No applications yet</h4>
+        <p>You haven't applied to any jobs yet.</p>
+        <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse Jobs</a>
+    </div>
+}
+
+@functions {
+    string GetStatusBadgeClass(MiniJobBoard.Infrastructure.Entities.ApplicationStatus status)
+    {
+        return status switch
+        {
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Pending => "secondary",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Reviewed => "info",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Shortlisted => "primary",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Rejected => "danger",
+            MiniJobBoard.Infrastructure.Entities.ApplicationStatus.Accepted => "success",
+            _ => "secondary"
+        };
+    }
+}

@@ -1,0 +1,40 @@
+@model MiniJobBoard.Web.Models.ApplyJobViewModel
+@{
+    ViewData["Title"] = "Apply for Job";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <h4 class="text-muted mb-4">@Model.JobTitle</h4>
+        
+        <form asp-action="Apply" method="post">
+            <input type="hidden" asp-for="JobId" />
+            <input type="hidden" asp-for="JobTitle" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="CoverLetter" class="form-label"></label>
+                <textarea asp-for="CoverLetter" class="form-control" rows="10" placeholder="Tell the employer why you're the perfect fit for this position..."></textarea>
+                <span asp-validation-for="CoverLetter" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="ResumeUrl" class="form-label"></label>
+                <input asp-for="ResumeUrl" class="form-control" placeholder="https://example.com/your-resume.pdf" />
+                <span asp-validation-for="ResumeUrl" class="text-danger"></span>
+                <small class="form-text text-muted">Provide a link to your online resume (Google Drive, Dropbox, personal website, etc.)</small>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-lg">Submit Application</button>
+                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@Model.JobId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
